@@ -11,7 +11,7 @@ GRC practitioners spend significant time manually producing recurring documents 
 
 ### Quick-start approach — Bob + skills + OpenPages MCP
 
-The fastest way to experience this is to use two skills available on [Propel](https://propel.ibm.com/) — the **`docx`** and **`pptx`** skills — combined with the [IBM OpenPages MCP Server](https://github.com/IBM/ibm-openpages-mcp-server). With Bob connected to OpenPages via MCP, you can ask it to pull live GRC data and fill any Office template in one prompt — no code required.
+The fastest way to experience this is to use two skills available on [Propel](https://propel.ibm.com/) — the **`docx`** and **`pptx`** skills — combined with the [IBM OpenPages MCP Server](https://github.com/IBM/ibm-openpages-mcp-server). With Bob connected to OpenPages via MCP, you can ask it to pull live GRC data and fill any Office template in one prompt — no code required. The result surpass the PDF you can generate from the TaskView. It also beats one can do with Cognos Reports.
 
 ![Bob generating a document from OpenPages data](assets/wxo_document_generation_1.gif)
 
@@ -82,62 +82,28 @@ Update the view configuration to include the AI Insights button on the Task View
 
 ### Architecture and Component Interactions
 
-The following schema illustrates how **IBM Bob**, **watsonx Orchestrate**, the **GRC Agent**, the **Custom Python Tools**, and **IBM OpenPages** interact during both tool creation and live runtime document generation:
+The following schema illustrates how **IBM Bob**, **watsonx Orchestrate**, and **IBM OpenPages** work together:
 
 ```mermaid
-flowchart TD
-    %% --- COLOUR PALETTE & STYLING ---
-    classDef actor fill:#374151,stroke:#d1d5db,stroke-width:2px,color:#fff
+flowchart LR
     classDef bob fill:#5b21b6,stroke:#ddd6fe,stroke-width:2px,color:#fff
     classDef wxo fill:#1e40af,stroke:#bfdbfe,stroke-width:2px,color:#fff
-    classDef tool fill:#0f766e,stroke:#99f6e4,stroke-width:2px,color:#fff
-    classDef op fill:#047857,stroke:#a7f3d0,stroke-width:2px,color:#fff
-    classDef out fill:#c2410c,stroke:#fed7aa,stroke-width:2px,color:#fff
+    classDef op  fill:#047857,stroke:#a7f3d0,stroke-width:2px,color:#fff
 
-    User((User / GRC Practitioner)):::actor
-
-    subgraph BobEnv["1. Authoring & Build Time — IBM Bob"]
-        direction TB
-        BobSkill(["wxo-create-template-filler skill"]):::bob
-        BobEngine(["Bob AI Assistant"]):::bob
-        BobSkill --> BobEngine
-        BobEngine --> BuildPlan(["1. Inspect template & generate {{PLACEHOLDERS}}"]):::bob
-        BuildPlan --> DiscoverOP(["2. Discover OpenPages data model via MCP"]):::bob
-        DiscoverOP --> ImplTool(["3. Generate Python @tool + fill logic"]):::bob
+    subgraph Bob["IBM Bob"]
+        BobSkill["wxo-create-template-filler skill"]:::bob
     end
 
-    subgraph WXOEnv["2. Server-side Execution — watsonx Orchestrate"]
-        direction TB
-        GRCAgent(["GRC Agent"]):::wxo
-        subgraph Tools["Tools Repository"]
-            direction TB
-            GenTool(["generate_audit_program_summary_pptx"]):::tool
-            ExcelTool(["export_table_to_excel"]):::tool
-        end
-        GRCAgent --> GenTool
-        GRCAgent --> ExcelTool
+    subgraph Orchestrate["watsonx Orchestrate"]
+        GenTool["generate_audit_program_summary_pptx"]:::wxo
     end
 
-    subgraph OPEnv["3. IBM OpenPages GRC Environment"]
-        direction TB
-        OPChat(["OpenPages AI Chat / AI Insights Button"]):::op
-        OPData[("OpenPages Database & REST API")]:::op
-        MCPProxy(["OpenPages MCP Proxy Server"]):::op
-        OPChat --> GRCAgent
-        MCPProxy <--> OPData
+    subgraph OpenPages["IBM OpenPages"]
+        AIChat["AI Chat"]:::op
+        AIInsights["AI Insights Button"]:::op
     end
 
-    ImplTool ==>|orchestrate tools import| GenTool
-    User -->|1. Prompt to build tool| BobEngine
-    User -->|2. Ask to generate report| OPChat
-    GenTool -->|JSON-RPC OPL queries| MCPProxy
-    GenTool --> OutputDoc(["Filled Presentation (.pptx) / Word Doc"]):::out
-    OutputDoc --> User
-
-    style BobEnv fill:none,stroke:#8b5cf6,stroke-width:2px,stroke-dasharray:5 5,color:#8b5cf6
-    style WXOEnv fill:none,stroke:#3b82f6,stroke-width:2px,color:#3b82f6
-    style OPEnv fill:none,stroke:#10b981,stroke-width:2px,stroke-dasharray:5 5,color:#10b981
-    style Tools fill:none,stroke:#14b8a6,stroke-width:2px,color:#14b8a6
+    Bob --> Orchestrate --> OpenPages
 ```
 
 ---
