@@ -85,6 +85,7 @@ Update the view configuration to include the AI Insights button on the Task View
 The following schema illustrates how **IBM Bob**, **watsonx Orchestrate**, and **IBM OpenPages** work together:
 
 ```mermaid
+%%{init: {"themeVariables": {"fontSize": "20px"}}}%%
 flowchart LR
     classDef bob fill:#5b21b6,stroke:#ddd6fe,stroke-width:2px,color:#fff
     classDef wxo fill:#1e40af,stroke:#bfdbfe,stroke-width:2px,color:#fff
