@@ -1,2 +1,8 @@
-theme: jekyll-theme-minimal
 title: IBM OpenPages — AI Document Generation with IBM Bob and Orchestrate
+description: A reference implementation for AI document generation in IBM OpenPages using watsonx Orchestrate and IBM Bob.
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
