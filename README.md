@@ -188,25 +188,16 @@ Please follow the wxo-create-template-filler procedure end-to-end:
 ├── assets/                                         ← Demo GIFs
 │
 ├── input/
-│   └── AR-2018-Audit-Report.pptx                   ← Sample source document (reference)
-│
-├── scripts/
-│   └── openpages_cookie_login.sh                   ← Helper: obtain an OpenPages session cookie
+│   └── AR-2018-Audit-Report.pptx                   ← Sample source document (step 2)
 │
 ├── tools/
-│   ├── generate_audit_program_summary_pptx/        ← Audit summary PPTX (AuditProgram)
-│   │   ├── generate_audit_program_summary_pptx.py  ← Single-tool entry point
+│   ├── generate_audit_program_summary_pptx/        ← Audit summary PPTX tool (AuditProgram)
+│   │   ├── generate_audit_program_summary_pptx.py  ← Orchestrate tool entry point
+│   │   ├── fill_audit_program_summary_pptx.py      ← Template fill logic
 │   │   ├── audit_program_summary_template_v1.pptx  ← PPTX template with {{PLACEHOLDERS}}
-│   │   ├── IMPLEMENTATION_PLAN.md
-│   │   ├── import-all.sh
-│   │   └── requirements.txt
-│   ├── generate_audit_report_docx/                 ← Audit Report DOCX (AuditProgram)
-│   │   ├── generate_audit_report_docx.py           ← Single-tool entry point
-│   │   ├── generate_audit_report_flow.py           ← Legacy 2-node flow wrapper
-│   │   ├── assemble_audit_payload.py               ← Legacy node 1 (fetch & clean)
-│   │   ├── audit_report_template_v1.docx           ← DOCX template with {{PLACEHOLDERS}}
-│   │   ├── IMPLEMENTATION_PLAN.md
-│   │   ├── import-all.sh
+│   │   ├── audit_program_summary_pptx_example.json ← Sample payload for local testing
+│   │   ├── IMPLEMENTATION_PLAN.md                  ← Bob-generated implementation plan
+│   │   ├── import-all.sh                           ← Deploy toolkit + tool + agent to Orchestrate
 │   │   └── requirements.txt
 │   └── export_table_to_excel/                      ← Export any conversation table to XLSX
 │       ├── export_table_to_excel.py
@@ -216,13 +207,11 @@ Please follow the wxo-create-template-filler procedure end-to-end:
 │   └── openpages-mcp/
 │       └── openpages-mcp.yaml                      ← MCP toolkit definition (update URL)
 │
-├── workspace/                                      ← Scratch workspace (design artefacts)
-│
 ├── .env.sample                                     ← Copy to .env and fill credentials
-├── workspace_config.yaml                           ← WXO ADK workspace paths
+├── workspace_config.yaml                           ← WXO ADK workspace config
 └── .bob/                                           ← Bob IDE config (skills, MCP servers)
     ├── mcp.json                                    ← MCP server registrations
     └── skills/
-        ├── wxo-create-template-filler/             ← Bob skill: build a new doc generator
+        ├── wxo-create-template-filler/             ← Bob skill: build a new doc generator tool
         └── wxo-builder/                            ← Bob skill: general WXO agent builder
 ```
