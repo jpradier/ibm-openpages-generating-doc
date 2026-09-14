@@ -171,7 +171,7 @@ Please follow the wxo-create-template-filler procedure end-to-end:
 
 ---
 
-## Repository structure
+## [Repository structure](https://github.com/jpradier/ibm-openpages-generating-doc)
 
 ```
 .
