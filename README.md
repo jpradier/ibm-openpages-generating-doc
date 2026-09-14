@@ -1,7 +1,7 @@
-# IBM OpenPages — AI Document Generation Demo
+# IBM OpenPages — AI Document Generation with IBM Bob and Orchestrate
 
 This repository contains all assets needed to demonstrate AI Document Generation capabilities infused into an
-IBM OpenPages GRC environment using **IBM watsonx Orchestrate** and **IBM Bob**.
+IBM OpenPages GRC environment using [**IBM watsonx Orchestrate**](https://www.ibm.com/products/watsonx-orchestrate) and [**IBM Bob**](https://bob.ibm.com).
 
 ---
 
