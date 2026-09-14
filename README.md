@@ -109,6 +109,44 @@ flowchart LR
 
 ---
 
+### Step by Step Guide
+
+**1. Configure Bob, Orchestrate and OpenPages**
+
+```bash
+git clone https://github.com/jpradier/ibm-openpages-generating-doc.git
+cd ibm-openpages-generating-doc
+```
+
+Follow the setup instructions in this repo to connect IBM Bob to your watsonx Orchestrate instance and your IBM OpenPages environment.
+
+**2. Produce a sample document**
+
+Produce a sample output document (e.g. an Audit Report, a Risk Analysis summary) that corresponds to a real object in your OpenPages instance. You can author it manually, or use the **OpenPages mode** in Bob to help you generate it from live data.
+
+**3. Use the `wxo-create-template-filler` skill**
+
+Switch to **Agent mode** in Bob and run the sample prompt below (see _Prompt Used to Generate the Tool_). Bob will inspect your sample document, propose a simplified template with `{{PLACEHOLDERS}}`, discover the OpenPages data model via MCP, and generate a self-contained Python tool ready for Orchestrate.
+
+**4. Deploy to Orchestrate and test**
+
+Deploy the OpenPages MCP server, the generated tool, and the GRC Agent to your watsonx Orchestrate instance:
+
+```bash
+cd toolkits/openpages-mcp
+# follow the instructions in the toolkit YAML
+cd ../../tools/generate_audit_program_summary_pptx
+sh import-all.sh
+```
+
+Test the agent in the Orchestrate draft environment, then promote it to live.
+
+**5. Configure OpenPages AI Chat and AI Insights**
+
+Point your OpenPages **AI Chat** integration to your deployed Orchestrate agent endpoint. Optionally, configure an **Extension** and a **Custom Machine Learning Model** to surface an _AI Insights_ button in the Object Task View.
+
+---
+
 ### Prompt Used to Generate the Tool
 
 The tool was created by providing Bob with the `wxo-create-template-filler` skill and running the following prompt:
