@@ -1,0 +1,9 @@
+kind: mcp
+name: generic-openpages-mcp
+description: openpages-mcp
+connections: []
+transport: streamable_http
+url: https://<url_prefix>.us-south.codeengine.appdomain.cloud/mcp
+tools:
+- '*'
+spec_version: v1

@@ -1,0 +1,576 @@
+openapi: 3.0.0
+info:
+  title: IBM watsonx Orchestrate API
+  description: |
+    API for IBM watsonx Orchestrate (WxO), enabling chat interactions with AI agents.
+    This API allows you to send messages to a specific agent and receive conversational
+    responses using an OpenAI-compatible chat completions interface.
+  version: 'v1'
+  contact:
+    name: IBM Cloud Support
+    url: https://cloud.ibm.com/unifiedsupport/supportcenter
+
+servers:
+  - url: https://api.us-south.watson-orchestrate.cloud.ibm.com/instances/7e676e38-ed23-4bef-8381-3a95743f4060
+    description: watsonx Orchestrate API server (US South - your instance)
+  - url: https://{instance_endpoint}
+    description: Custom watsonx Orchestrate instance endpoint
+    variables:
+      instance_endpoint:
+        default: api.us-south.watson-orchestrate.cloud.ibm.com/instances/7e676e38-ed23-4bef-8381-3a95743f4060
+        description: The instance endpoint for your watsonx Orchestrate deployment
+
+security:
+  - IBMCloudIAM: []
+
+paths:
+  /v1/orchestrate/agents:
+    get:
+      tags:
+        - Agents
+      summary: List registered agents
+      description: |
+        Lists all registered agents in the watsonx Orchestrate instance.
+        Use this endpoint to discover available agent IDs for use with the
+        chat completions endpoint.
+      operationId: listRegisteredAgents
+      parameters:
+        - name: show_bundled
+          in: query
+          required: false
+          description: Whether to include bundled (built-in) agents in the response.
+          schema:
+            type: boolean
+            default: false
+        - name: include_hidden
+          in: query
+          required: false
+          description: Whether to include hidden agents in the response.
+          schema:
+            type: boolean
+            default: false
+        - name: ids
+          in: query
+          required: false
+          description: Filter agents by a list of UUIDs.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: true
+        - name: names
+          in: query
+          required: false
+          description: Filter agents by a list of names.
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: workspace_id
+          in: query
+          required: false
+          description: Filter agents by workspace ID.
+          schema:
+            type: string
+        - name: include
+          in: query
+          required: false
+          description: |
+            List of additional scopes to include. Supported values:
+            - `global`: Include agents from the global workspace along with the specified workspace.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response — list of registered agents.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListAgent'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/orchestrate/{agent_id}/chat/completions:
+    post:
+      tags:
+        - Orchestrate Agent
+      summary: Chat with an agent
+      description: |
+        Send a chat message to a specific watsonx Orchestrate agent and receive a
+        conversational response. Supports optional thread tracking via the
+        X-IBM-THREAD-ID header to maintain conversation history across calls.
+      operationId: chatWithAgent
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          description: The unique identifier of the agent to chat with.
+          schema:
+            type: string
+            description: Agent ID
+            default: "a5b9d795-a5b8-4053-a152-5c49f6b5e920"
+        - name: X-IBM-THREAD-ID
+          in: header
+          required: false
+          description: Optional header to specify the thread ID for conversation continuity.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+            example:
+              messages:
+                - role: "user"
+                  content: "What can you do for me?"
+              stream: false
+      responses:
+        '200':
+          description: Successful chat completion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ListAgent:
+      type: object
+      required:
+        - id
+        - tenant_id
+        - name
+        - description
+        - style
+        - created_by
+        - created_on
+        - updated_by
+        - updated_at
+      description: Schema representing a registered agent.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the agent.
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        tenant_id:
+          type: string
+          description: ID of the tenant that owns this agent.
+        name:
+          type: string
+          description: Name of the agent.
+          example: "my-grc-assistant"
+        description:
+          type: string
+          description: Description of what the agent does.
+          example: "An assistant for GRC risk and control management."
+        style:
+          type: string
+          description: The style/type of the agent (e.g. native, external, assistant).
+          example: "default"
+        instructions:
+          type: string
+          description: System instructions for the agent.
+          nullable: true
+        tools:
+          type: array
+          description: List of tool names or tool objects available to the agent.
+          items:
+            oneOf:
+              - type: string
+              - type: object
+                additionalProperties: true
+          default: []
+        collaborators:
+          type: array
+          description: List of other agent names or objects this agent collaborates with.
+          items:
+            oneOf:
+              - type: string
+              - type: object
+                additionalProperties: true
+          default: []
+        knowledge_base:
+          type: array
+          description: List of knowledge base names available to the agent.
+          items:
+            type: string
+          default: []
+        tags:
+          type: array
+          description: List of tags associated with the agent.
+          items:
+            type: string
+          nullable: true
+          default: []
+        display_name:
+          type: string
+          description: Human-readable display name for the agent.
+          nullable: true
+        structured_output:
+          type: object
+          description: JSON schema defining the structure for agent responses.
+          additionalProperties: true
+          nullable: true
+        hide_reasoning:
+          type: boolean
+          description: Whether to hide the reasoning trace from users.
+          default: false
+        context_access_enabled:
+          type: boolean
+          description: Whether this agent can access context variables.
+          default: true
+        context_variables:
+          type: array
+          description: List of context variable names this agent can access.
+          items:
+            type: string
+          default: []
+        bundled_agent_id:
+          type: string
+          format: uuid
+          description: Base agent ID if this is a bundled agent variant.
+          nullable: true
+        created_by:
+          type: string
+          description: ID of the user who created the agent.
+        created_on:
+          type: string
+          format: date-time
+          description: Timestamp when the agent was created.
+        updated_by:
+          type: string
+          description: ID of the user who last updated the agent.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the agent was last updated.
+
+    ChatCompletionRequest:
+      type: object
+      required:
+        - messages
+        - stream
+      description: Request body for chatting with a watsonx Orchestrate agent.
+      properties:
+        messages:
+          type: array
+          description: The conversation messages to send to the agent.
+          items:
+            $ref: '#/components/schemas/CreateMessageV2'
+          default:
+            - role: "user"
+              content: "What can you do for me?"
+          example:
+            - role: "user"
+              content: "What can you do for me?"
+        additional_parameters:
+          type: object
+          description: Optional additional parameters to pass to the agent.
+          additionalProperties: true
+          nullable: true
+        context:
+          type: object
+          description: Optional context dictionary to pass to the agent.
+          additionalProperties: true
+          nullable: true
+        stream:
+          type: boolean
+          description: |
+            Whether to stream the response. When true, the response is returned as
+            a Server-Sent Events (SSE) stream. When false (required for OpenPages
+            and any client that cannot consume SSE), the full response is returned
+            as a single JSON object.
+          default: false
+          example: false
+
+    CreateMessageV2:
+      type: object
+      required:
+        - role
+        - content
+      description: A single chat message in a conversation.
+      properties:
+        role:
+          type: string
+          description: The role of the message sender.
+          enum: [user, assistant, system]
+          default: "user"
+          example: "user"
+        content:
+          description: |
+            The content of the message. Can be a plain string or an array of
+            structured AssistantContent objects.
+          oneOf:
+            - type: string
+              description: Plain text message content.
+              default: "What can you do for me?"
+              example: "What can you do for me?"
+            - type: array
+              description: Structured content array (used for assistant responses).
+              items:
+                $ref: '#/components/schemas/AssistantContent'
+
+    AssistantContent:
+      type: object
+      required:
+        - response_type
+      description: Structured content block used in assistant messages.
+      additionalProperties: true
+      properties:
+        response_type:
+          $ref: '#/components/schemas/AssistantContentType'
+        json_schema:
+          type: object
+          description: JSON schema for form-type responses.
+          additionalProperties: true
+          nullable: true
+        ui_schema:
+          type: object
+          description: UI schema for form rendering.
+          additionalProperties: true
+          nullable: true
+        form_data:
+          type: object
+          description: Submitted form data.
+          additionalProperties: true
+          nullable: true
+          default: {}
+        id:
+          type: string
+          description: Optional ID for the content block.
+          nullable: true
+        form_operation:
+          type: string
+          description: The form operation type.
+          nullable: true
+        sub_type:
+          type: string
+          description: Sub-type of the content.
+          nullable: true
+        event_type:
+          type: string
+          description: Event type for event-driven content.
+          nullable: true
+        dps_payload_id:
+          type: string
+          description: DPS payload ID reference.
+          nullable: true
+
+    AssistantContentType:
+      type: string
+      description: The type of structured content in an assistant response.
+      enum:
+        - conversational_search
+        - text
+        - image
+        - option
+        - pause
+        - iframe
+        - connect_to_agent
+        - suggestion
+        - channel_transfer
+        - search
+        - user_defined
+        - video
+        - audio
+        - date
+        - inline
+
+    ChatCompletionResponse:
+      type: object
+      required:
+        - id
+        - object
+        - created
+        - model
+        - choices
+        - thread_id
+      description: Response from a watsonx Orchestrate agent chat completion.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this completion.
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        object:
+          type: string
+          description: The object type, always "chat.completion".
+          example: "chat.completion"
+        created:
+          type: integer
+          description: Unix timestamp when the response was created.
+          example: 1677610602
+        model:
+          type: string
+          description: The model identifier used to generate the response.
+          example: "watsonx-orchestrate-agent"
+        choices:
+          type: array
+          description: The list of completion choices.
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              index:
+                type: integer
+                description: The index of this choice.
+                example: 0
+              message:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    description: The role of the responder, typically "assistant".
+                    example: "assistant"
+                  content:
+                    type: string
+                    description: The text content of the assistant's response.
+              finish_reason:
+                type: string
+                description: The reason why the response generation stopped.
+                example: "stop"
+        thread_id:
+          type: string
+          format: uuid
+          description: |
+            The thread ID for this conversation. Pass this value in the
+            X-IBM-THREAD-ID header of subsequent requests to maintain conversation
+            continuity.
+          example: "660e8400-e29b-41d4-a716-446655440001"
+
+    HTTPValidationError:
+      type: object
+      description: Validation error response.
+      properties:
+        detail:
+          type: array
+          description: List of validation error details.
+          items:
+            $ref: '#/components/schemas/ValidationError'
+
+    ValidationError:
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      description: A single validation error detail.
+      properties:
+        loc:
+          type: array
+          description: The location of the validation error (field path).
+          items:
+            oneOf:
+              - type: string
+              - type: integer
+        msg:
+          type: string
+          description: Human-readable error message.
+        type:
+          type: string
+          description: The error type identifier.
+
+    ErrorResponse:
+      type: object
+      description: Standard error response.
+      properties:
+        status_code:
+          type: integer
+          description: The HTTP status code.
+        error:
+          type: string
+          description: Error type identifier.
+        message:
+          type: string
+          description: Human-readable error message.
+        trace_id:
+          type: string
+          description: Trace ID for debugging and support.
+
+  securitySchemes:
+    IBMCloudIAM:
+      type: oauth2
+      description: |
+        Authentication for watsonx Orchestrate API using IBM Cloud IAM.
+        This scheme exchanges an IBM Cloud API key for a bearer token.
+
+        The token endpoint expects a form-encoded body with:
+        - grant_type: urn:ibm:params:oauth:grant-type:apikey
+        - apikey: your-api-key-value
+
+        To use this authentication:
+        1. Create an API key in IBM Cloud
+        2. Exchange it for a bearer token via the token endpoint
+        3. Use the bearer token in the Authorization header as: Bearer <token>
+      flows:
+        clientCredentials:
+          tokenUrl: https://iam.cloud.ibm.com/identity/token
+          scopes: {}
+      x-ibm-iam-type: IBM

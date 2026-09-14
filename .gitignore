@@ -1,0 +1,62 @@
+# Secrets
+.env
+
+
+# Project-specific output directories
+SRA/
+SSRS/
+
+# Python virtual environment
+.venv/
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# macOS
+.DS_Store
+
+# Office temporary lock files
+~$*
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Generated outputs
+./*.xlsx
+./*.docx
+./*.pdf
+
+node_modules/
+
+workspace/
+
+# Transient output artefacts (test renders, intermediate fills)
+output/*.pdf
+output/*.jpg
+output/*_test_*.docx
+output/*_filled_*.docx
+output/*_copy.dotx
+
+
+
+# Office temporary lock files
+~$*
+.bob/tmp/

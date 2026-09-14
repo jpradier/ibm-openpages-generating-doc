@@ -1,0 +1,68 @@
+{
+  "mcpServers": {
+    "openpages-mcp-server": {
+      "url": "https://generic-openpages-mcp-server.2c20hyggoq5p.us-south.codeengine.appdomain.cloud/mcp",
+      "type": "streamable-http",
+      "headers": {},
+      "alwaysAllow": [
+        "list_resources",
+        "access",
+        "echo",
+        "get_resource",
+        "query_openpages",
+        "openpages_associate_objects",
+        "execute_openpages_query"
+      ],
+      "disabled": false,
+      "disabledTools": [
+        "openpages_delete_object"
+      ]
+    },
+    "bob-marketplace": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:39247/mcp",
+      "headers": {
+        "Bob-Marketplace-Token": "bob-marketplace-local"
+      },
+      "disabled": false,
+      "alwaysAllow": [
+        "search_assets",
+        "get_asset",
+        "list_installed",
+        "list_favorites",
+        "suggest_assets",
+        "list_updates"
+      ]
+    },
+    "watsonx-orchestrate-adk-docs": {
+      "command": "/Users/pradier/.local/bin/uvx",
+      "args": [
+        "mcp-proxy",
+        "--transport",
+        "streamablehttp",
+        "https://developer.watson-orchestrate.ibm.com/mcp"
+      ],
+      "timeout": 120000
+    },
+    "watsonx-orchestrate-adk": {
+      "command": "/Users/pradier/.local/bin/uvx",
+      "args": [
+        "ibm-watsonx-orchestrate-mcp-server"
+      ],
+      "env": {
+        "WXO_MCP_WORKING_DIRECTORY": "/Users/pradier/Projects/openpages/ibm-openpages-gen-doc",
+        "WXO_MCP_DEBUG": ""
+      },
+      "timeout": 120000
+    }
+  },
+  "exa": {
+    "type": "streamable-http",
+    "url": "https://mcp.exa.ai/mcp",
+    "alwaysAllow": [
+      "web_search_exa",
+      "web_fetch_exa"
+    ],
+    "disabled": false
+  }
+}
