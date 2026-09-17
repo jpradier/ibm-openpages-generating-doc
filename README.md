@@ -3,6 +3,8 @@
 This repository contains all assets needed to demonstrate AI Document Generation capabilities infused into an
 IBM OpenPages GRC environment using [**IBM watsonx Orchestrate**](https://www.ibm.com/products/watsonx-orchestrate) and [**IBM Bob**](https://bob.ibm.com).
 
+[![View on GitHub](https://img.shields.io/badge/GitHub-ibm--openpages--generating--doc-161616?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jpradier/ibm-openpages-generating-doc)
+
 ---
 
 ## The need: AI-powered document generation

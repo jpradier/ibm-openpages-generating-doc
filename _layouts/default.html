@@ -296,21 +296,9 @@
       const content = document.getElementById('content');
       if (!content) return;
 
-      // First, hoist the page-level h1 (README title) out — it's in the hero already
+      // Hoist the page-level h1 (README title) out — it's in the hero already
       const h1 = content.querySelector('h1');
-      if (h1) {
-        // Remove h1 + the <p> intro + first <hr> (already in hero)
-        let node = h1;
-        // collect until first H2
-        const toRemove = [];
-        while (node) {
-          const next = node.nextSibling;
-          if (node.nodeType === 1 && node.tagName === 'H2') break;
-          toRemove.push(node);
-          node = next;
-        }
-        toRemove.forEach(n => n.remove());
-      }
+      if (h1) h1.remove();
 
       // Wrap sections into cards
       const children = Array.from(content.childNodes);
@@ -344,6 +332,19 @@
         const code = pre.querySelector('code');
         if (code && code.textContent.trim().startsWith('.')) {
           pre.classList.add('tree');
+        }
+      });
+
+      // Wrap images in .demo-block for consistent GIF styling
+      // Skip badge/shield images — they should stay inline at natural size
+      content.querySelectorAll('img').forEach(img => {
+        const src = img.getAttribute('src') || '';
+        const isBadge = src.includes('shields.io') || src.includes('img.shields') || src.includes('badge');
+        if (!isBadge && !img.closest('.demo-block')) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'demo-block';
+          img.parentNode.insertBefore(wrapper, img);
+          wrapper.appendChild(img);
         }
       });
     })();
