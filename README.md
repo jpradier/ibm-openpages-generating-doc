@@ -1,7 +1,6 @@
 # IBM OpenPages — AI Document Generation with IBM Bob and Orchestrate
 
-This repository contains all assets needed to demonstrate AI Document Generation capabilities infused into an
-IBM OpenPages GRC environment using [**IBM watsonx Orchestrate**](https://www.ibm.com/products/watsonx-orchestrate) and [**IBM Bob**](https://bob.ibm.com).
+GRC practitioners using [**IBM OpenPages**](https://www.ibm.com/products/openpages) spend significant time manually assembling recurring documents — audit reports, risk summaries, workpaper packs — by copy-pasting data out of the platform into Word or PowerPoint. [**IBM Bob**](https://bob.ibm.com) and [**IBM watsonx Orchestrate**](https://www.ibm.com/products/watsonx-orchestrate) can eliminate that entirely. This repository is a reference implementation that shows how to wire OpenPages to an AI agent capable of generating polished Office documents (.docx, .xlsx, .pptx) directly from live GRC data.
 
 [![View on GitHub](https://img.shields.io/badge/GitHub-ibm--openpages--generating--doc-161616?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jpradier/ibm-openpages-generating-doc)
 
